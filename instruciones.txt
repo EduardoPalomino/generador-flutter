@@ -1,0 +1,3 @@
+IR DENTRO DE LA CARPETA "GENERADOR-FLUTTER" repositorio
+copiar la carpeta "generador_flutter"  dentro la carpeta del proyecto flutter a trabajar 
+reemplazar la carpeta lib por la que se necunatra dentro de "GENERADOR-FLUTTER" repositorio
