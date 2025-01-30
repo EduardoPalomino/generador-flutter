@@ -1,3 +1,4 @@
-IR DENTRO DE LA CARPETA "GENERADOR-FLUTTER" repositorio
-copiar la carpeta "generador_flutter"  dentro la carpeta del proyecto flutter a trabajar 
-reemplazar la carpeta lib por la que se necunatra dentro de "GENERADOR-FLUTTER" repositorio
+1. Ir dentro de la carpeta "GENERADOR-FLUTTER" del repositorio.
+2. Copiar la carpeta "generador_flutter" dentro de la carpeta del proyecto Flutter en el que estás trabajando.
+3. Reemplazar la carpeta "lib" del proyecto Flutter por la que se encuentra dentro de "GENERADOR-FLUTTER".
+4. Copiar y reemplazar el archivo "pubspec.yaml" en el proyecto con el archivo "pubspec.yaml" que se encuentra dentro de "GENERADOR-FLUTTER".
