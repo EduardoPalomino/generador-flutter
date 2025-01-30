@@ -20,7 +20,7 @@ void main(List<String> args) async {
   buffer.writeln("class $repoName {");
   buffer.writeln("  final String baseUrl = \"http://localhost:3009/${modelName}s\";\n");
 
-  buffer.writeln("  Future<$className> get$modelName(String nombre) async {");
+  buffer.writeln("  Future<$className> get$className(String nombre) async {");
   buffer.writeln("    final result = await http.get(Uri.parse(baseUrl));");
   buffer.writeln("    if (result.statusCode != 200) throw Exception();");
   buffer.writeln("    final List<dynamic> response = json.decode(result.body);");
@@ -28,20 +28,20 @@ void main(List<String> args) async {
   buffer.writeln("    return items.firstWhere((item) => item.nombre.toLowerCase() == nombre.toLowerCase(), orElse: () => throw Exception('$modelName no encontrado'));");
   buffer.writeln("  }\n");
 
-  buffer.writeln("  Future<List<$className>> get${modelName}s() async {");
+  buffer.writeln("  Future<List<$className>> get${className}s() async {");
   buffer.writeln("    final result = await http.get(Uri.parse(baseUrl));");
   buffer.writeln("    if (result.statusCode != 200) throw Exception('Error al obtener datos');");
   buffer.writeln("    final List<dynamic> response = json.decode(result.body);");
   buffer.writeln("    return response.map((json) => $className.fromJson(json)).toList();");
   buffer.writeln("  }\n");
 
-  buffer.writeln("  Future<$className> get${modelName}ById(String id) async {");
+  buffer.writeln("  Future<$className> get${className}ById(String id) async {");
   buffer.writeln("    final result = await http.get(Uri.parse('\$baseUrl/\$id'));");
   buffer.writeln("    if (result.statusCode != 200) throw Exception('$modelName no encontrado');");
   buffer.writeln("    return $className.fromJson(json.decode(result.body));");
   buffer.writeln("  }\n");
 
-  buffer.writeln("  Future<$className> create$modelName($className data) async {");
+  buffer.writeln("  Future<$className> create$className($className data) async {");
   buffer.writeln("    final result = await http.post(");
   buffer.writeln("      Uri.parse('\$baseUrl/create'),");
   buffer.writeln("      headers: {'Content-Type': 'application/json'},");
@@ -51,7 +51,7 @@ void main(List<String> args) async {
   buffer.writeln("    return $className.fromJson(json.decode(result.body));");
   buffer.writeln("  }\n");
 
-  buffer.writeln("  Future<$className> update$modelName(String id, $className data) async {");
+  buffer.writeln("  Future<$className> update$className(String id, $className data) async {");
   buffer.writeln("    final result = await http.put(");
   buffer.writeln("      Uri.parse('\$baseUrl/update/\$id'),");
   buffer.writeln("      headers: {'Content-Type': 'application/json'},");
@@ -61,7 +61,7 @@ void main(List<String> args) async {
   buffer.writeln("    return $className.fromJson(json.decode(result.body));");
   buffer.writeln("  }\n");
 
-  buffer.writeln("  Future<void> delete$modelName(String id) async {");
+  buffer.writeln("  Future<void> delete$className(String id) async {");
   buffer.writeln("    final result = await http.delete(Uri.parse('\$baseUrl/delete/\$id'));");
   buffer.writeln("    if (result.statusCode != 200) throw Exception('Error al eliminar $modelName');");
   buffer.writeln("  }");

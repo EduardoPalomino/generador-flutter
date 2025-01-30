@@ -15,8 +15,8 @@ void main(List<String> args) async {
   final Map<String, String> files = {
     "$blocPath/${modelName}_bloc.dart": "import 'package:bloc/bloc.dart';\n"
         "import 'package:equatable/equatable.dart';\n"
-        "import '../../data/models/$modelName.dart';\n"
-        "import '../../data/repositories/${modelName}_repository.dart';\n"
+        "import '../../../data/models/$modelName.dart';\n"
+        "import '../../../data/repositories/${modelName}_repository.dart';\n"
         "part '${modelName}_event.dart';\n"
         "part '${modelName}_state.dart';\n\n"
         "class ${className}Bloc extends Bloc<${className}Event, ${className}State> {\n"
