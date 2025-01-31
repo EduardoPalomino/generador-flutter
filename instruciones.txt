@@ -7,3 +7,7 @@
 dart generate_model.dart user id,nombre,password,email,rol_id
 dart generate_repository.dart user
 dart generate_bloc.dart user
+
+
+wigets existentes en material :
+https://api.flutter.dev/flutter/material/material-library.html
