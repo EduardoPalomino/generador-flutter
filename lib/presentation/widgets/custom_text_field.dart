@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  final String texto;
+  final String texto;  // Cambia "texto" por "label"
   final Key? fieldKey;
-  final bool obscureText;  // Añadimos esta propiedad
-  final TextEditingController? controller;  // Hacemos que el controlador sea opcional
-  final TextInputType keyboardType;  // Tipo de teclado, por defecto es texto
-  final TextStyle? textStyle;  // Estilo de texto opcional
+  final bool obscureText;
+  final TextEditingController? controller;
+  final TextInputType keyboardType;
+  final TextStyle? textStyle;
+  final String? Function(String?)? validator; // Agrega el parámetro validator
 
   const CustomTextField({
     super.key,
-    required this.texto,
+    required this.texto,  // Cambia "texto" por "label"
     this.fieldKey,
     this.controller,
-    this.obscureText = false,  // Valor predeterminado en falso
-    this.keyboardType = TextInputType.text,  // Tipo de entrada por defecto
-    this.textStyle,  // Estilo de texto opcional
+    this.obscureText = false,
+    this.keyboardType = TextInputType.text,
+    this.textStyle,
+    this.validator, // Incluye el parámetro en el constructor
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0), // Añadir margen superior e inferior
-      child: TextField(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
         key: fieldKey,
-        controller: controller,  // Asignamos el controlador si existe
-        obscureText: obscureText,  // Usamos la propiedad que hemos recibido
-        keyboardType: keyboardType,  // Definimos el tipo de teclado
-        style: textStyle,  // Aplicamos el estilo del texto
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        style: textStyle,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          labelText: texto,
+          labelText: texto,  // Cambia "texto" por "label"
         ),
+        validator: validator, // Asigna el validador
       ),
     );
   }

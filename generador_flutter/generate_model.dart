@@ -7,12 +7,13 @@ void main(List<String> args) async {
   }
 
   final String modelName = args[0];
+  final String className = "${modelName[0].toUpperCase()}${modelName.substring(1)}";
   final List<String> fields = args[1].split(',');
 
   final buffer = StringBuffer();
 
   // Generar la clase
-  buffer.writeln('class ${modelName[0].toUpperCase()}${modelName.substring(1)}Model {');
+  buffer.writeln('class $className {');
 
   // Declarar los campos
   for (var field in fields) {
@@ -20,38 +21,46 @@ void main(List<String> args) async {
   }
 
   // Constructor
-  buffer.writeln('  ${modelName[0].toUpperCase()}${modelName.substring(1)}Model({');
+  buffer.writeln('  const $className({');
   for (var field in fields) {
     buffer.writeln('    required this.$field,');
   }
-  buffer.writeln('  });');
+  buffer.writeln('  });\n');
 
   // Método fromJson
-  buffer.writeln('  factory ${modelName[0].toUpperCase()}${modelName.substring(1)}Model.fromJson(Map<String, dynamic> json) {');
-  buffer.writeln('    return ${modelName[0].toUpperCase()}${modelName.substring(1)}Model(');
+  buffer.writeln('  factory $className.fromJson(Map<String, dynamic> json) {');
+  buffer.writeln('    return $className(');
   for (var field in fields) {
-    buffer.writeln('      $field: json["$field"],');
+    if (field == 'id') {
+      buffer.writeln('      $field: json["_id"]?.toString() ?? "",');
+    } else {
+      buffer.writeln('      $field: json["$field"]?.toString() ?? "",');
+    }
   }
   buffer.writeln('    );');
-  buffer.writeln('  }');
+  buffer.writeln('  }\n');
 
   // Método toJson
   buffer.writeln('  Map<String, dynamic> toJson() {');
   buffer.writeln('    return {');
   for (var field in fields) {
-    buffer.writeln('      "$field": $field,');
+    if (field == 'id') {
+      buffer.writeln('      "_id": $field,');
+    } else {
+      buffer.writeln('      "$field": $field,');
+    }
   }
   buffer.writeln('    };');
-  buffer.writeln('  }');
+  buffer.writeln('  }\n');
 
   buffer.writeln('}');
 
   // Crear archivo
-  final file = File('../lib/data/models/$modelName.dart');
+  final file = File('../lib/data/models/${modelName.toLowerCase()}.dart');
 
   try {
     await file.writeAsString(buffer.toString());
-    print('Archivo $modelName.dart generado exitosamente.');
+    print('Archivo ${modelName.toLowerCase()}.dart generado exitosamente.');
   } catch (e) {
     print('Error al escribir en el archivo: $e');
   }

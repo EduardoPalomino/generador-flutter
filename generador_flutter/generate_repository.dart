@@ -1,71 +1,90 @@
 import 'dart:io';
 
 void main(List<String> args) async {
-  if (args.isEmpty) {
-    print("Uso: dart generate_repository.dart <nombre_modelo>");
+  if (args.length < 2) {
+    print("Uso: dart generate_repository.dart <nombre_modelo> <campo1,campo2,...>");
     return;
   }
 
   final String modelName = args[0];
-  final String funcName = "${modelName[0].toUpperCase()}${modelName.substring(1)}";
-  final String className = "${modelName[0].toUpperCase()}${modelName.substring(1)}Model";
-  final String repoName = "${modelName[0].toUpperCase()}${modelName.substring(1)}Repo";
+  final List<String> fields = args[1].split(',');
+  final String className = "${modelName[0].toUpperCase()}${modelName.substring(1)}";
+  final String repoName = "${className}Repository";
   final String fileName = modelName.toLowerCase();
+
+  // Separar el campo 'id' (si existe)
+  final bool hasId = fields.contains('id');
+  final List<String> nonIdFields = fields.where((field) => field != 'id').toList();
 
   final buffer = StringBuffer();
 
-  buffer.writeln("import 'package:http/http.dart' as http;");
+  buffer.writeln("import '../models/$fileName.dart';");
   buffer.writeln("import 'dart:convert';");
-  buffer.writeln("import '../models/$fileName.dart';\n");
+  buffer.writeln("import 'package:http/http.dart' as http;\n");
 
   buffer.writeln("class $repoName {");
-  buffer.writeln("  final String baseUrl = \"http://localhost:3009/${modelName}s\";\n");
+  buffer.writeln("  final String _baseUrl = 'http://localhost:3009/${className}s';\n");
 
-  buffer.writeln("  Future<$className> get$funcName(String nombre) async {");
-  buffer.writeln("    final result = await http.get(Uri.parse(baseUrl));");
-  buffer.writeln("    if (result.statusCode != 200) throw Exception();");
-  buffer.writeln("    final List<dynamic> response = json.decode(result.body);");
-  buffer.writeln("    final List<$className> items = response.map((json) => $className.fromJson(json)).toList();");
-  buffer.writeln("    return items.firstWhere((item) => item.nombre.toLowerCase() == nombre.toLowerCase(), orElse: () => throw Exception('$modelName no encontrado'));");
+  // Método GET
+  buffer.writeln("  Future<List<$className>> get${className}s() async {");
+  buffer.writeln("    final response = await http.get(Uri.parse(_baseUrl));");
+  buffer.writeln("    if (response.statusCode == 200) {");
+  buffer.writeln("      List<dynamic> data = json.decode(response.body);");
+  buffer.writeln("      return data.map((json) => $className.fromJson(json)).toList();");
+  buffer.writeln("    } else {");
+  buffer.writeln("      throw Exception('Error al cargar ${modelName}s');");
+  buffer.writeln("    }");
   buffer.writeln("  }\n");
 
-  buffer.writeln("  Future<List<$className>> get${funcName}s() async {");
-  buffer.writeln("    final result = await http.get(Uri.parse(baseUrl));");
-  buffer.writeln("    if (result.statusCode != 200) throw Exception('Error al obtener datos');");
-  buffer.writeln("    final List<dynamic> response = json.decode(result.body);");
-  buffer.writeln("    return response.map((json) => $className.fromJson(json)).toList();");
-  buffer.writeln("  }\n");
+  // Método ADD (excluyendo 'id')
+  if (nonIdFields.isNotEmpty) {
+    buffer.writeln("  Future<void> add$className(${nonIdFields.map((f) => "String $f").join(', ')}) async {");
+    buffer.writeln("    final response = await http.post(");
+    buffer.writeln("      Uri.parse('\$_baseUrl/create'),");
+    buffer.writeln("      body: json.encode({");
+    for (var field in nonIdFields) {
+      buffer.writeln("        '$field': $field,");
+    }
+    buffer.writeln("      }),");
+    buffer.writeln("      headers: {'Content-Type': 'application/json'},");
+    buffer.writeln("    );");
+    buffer.writeln("    print('Response status: \${response.statusCode}');");
+    buffer.writeln("    print('Response body: \${response.body}');");
+    buffer.writeln("    if (response.statusCode != 200) {");
+    buffer.writeln("      throw Exception('Error al agregar ${modelName}');");
+    buffer.writeln("    }");
+    buffer.writeln("  }\n");
+  }
 
-  buffer.writeln("  Future<$className> get${funcName}ById(String id) async {");
-  buffer.writeln("    final result = await http.get(Uri.parse('\$baseUrl/\$id'));");
-  buffer.writeln("    if (result.statusCode != 200) throw Exception('$modelName no encontrado');");
-  buffer.writeln("    return $className.fromJson(json.decode(result.body));");
-  buffer.writeln("  }\n");
+  // Método UPDATE (incluyendo 'id')
+  if (hasId && nonIdFields.isNotEmpty) {
+    buffer.writeln("  Future<void> update$className(String id, ${nonIdFields.map((f) => "String $f").join(', ')}) async {");
+    buffer.writeln("    final response = await http.put(");
+    buffer.writeln("      Uri.parse('\$_baseUrl/update/\$id'),");
+    buffer.writeln("      body: json.encode({");
+    for (var field in nonIdFields) {
+      buffer.writeln("        '$field': $field,");
+    }
+    buffer.writeln("      }),");
+    buffer.writeln("      headers: {'Content-Type': 'application/json'},");
+    buffer.writeln("    );");
+    buffer.writeln("    if (response.statusCode != 200) {");
+    buffer.writeln("      throw Exception('Error al actualizar ${modelName}');");
+    buffer.writeln("    }");
+    buffer.writeln("  }\n");
+  }
 
-  buffer.writeln("  Future<$className> create$funcName($className data) async {");
-  buffer.writeln("    final result = await http.post(");
-  buffer.writeln("      Uri.parse('\$baseUrl/create'),");
-  buffer.writeln("      headers: {'Content-Type': 'application/json'},");
-  buffer.writeln("      body: json.encode(data.toJson()),");
-  buffer.writeln("    );");
-  buffer.writeln("    if (result.statusCode != 201) throw Exception('Error al crear $modelName');");
-  buffer.writeln("    return $className.fromJson(json.decode(result.body));");
-  buffer.writeln("  }\n");
-
-  buffer.writeln("  Future<$className> update$funcName(String id, $className data) async {");
-  buffer.writeln("    final result = await http.put(");
-  buffer.writeln("      Uri.parse('\$baseUrl/update/\$id'),");
-  buffer.writeln("      headers: {'Content-Type': 'application/json'},");
-  buffer.writeln("      body: json.encode(data.toJson()),");
-  buffer.writeln("    );");
-  buffer.writeln("    if (result.statusCode != 200) throw Exception('Error al actualizar $modelName');");
-  buffer.writeln("    return $className.fromJson(json.decode(result.body));");
-  buffer.writeln("  }\n");
-
-  buffer.writeln("  Future<void> delete$funcName(String id) async {");
-  buffer.writeln("    final result = await http.delete(Uri.parse('\$baseUrl/delete/\$id'));");
-  buffer.writeln("    if (result.statusCode != 200) throw Exception('Error al eliminar $modelName');");
-  buffer.writeln("  }");
+  // Método DELETE
+  if (hasId) {
+    buffer.writeln("  Future<void> delete$className(String id) async {");
+    buffer.writeln("    final response = await http.delete(Uri.parse('\$_baseUrl/delete/\$id'));");
+    buffer.writeln("    print('REPOSITORY');");
+    buffer.writeln("    print('Response delete$className: \${response.statusCode}');");
+    buffer.writeln("    if (response.statusCode != 200) {");
+    buffer.writeln("      throw Exception('Error al eliminar ${modelName}');");
+    buffer.writeln("    }");
+    buffer.writeln("  }");
+  }
 
   buffer.writeln("}");
 
@@ -76,6 +95,6 @@ void main(List<String> args) async {
     await file.writeAsString(buffer.toString());
     print('Archivo ${fileName}_repository.dart generado exitosamente.');
   } catch (e) {
-    print('Error al escribir en el archivo: \$e');
+    print('Error al escribir en el archivo: $e');
   }
 }

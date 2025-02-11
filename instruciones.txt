@@ -9,5 +9,11 @@ dart generate_repository.dart user
 dart generate_bloc.dart user
 
 
+dart generate_model.dart rol id,nombre,descripcion
+dart generate_repository.dart rol id,nombre,descripcion
+dart generate_bloc.dart rol id,nombre,descripcion
+//PANTALLAS
+dart generate_screen.dart rol id,nombre,descripcion
+
 wigets existentes en material :
 https://api.flutter.dev/flutter/material/material-library.html
