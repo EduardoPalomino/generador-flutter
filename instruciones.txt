@@ -5,8 +5,8 @@
 
 # Activar generadores
 dart generate_model.dart user id,nombre,password,email,rol_id
-dart generate_repository.dart user
-dart generate_bloc.dart user
+dart generate_repository.dart user id,nombre,password,email,rol_id
+dart generate_bloc.dart user id,nombre,password,email,rol_id
 
 
 dart generate_model.dart rol id,nombre,descripcion
